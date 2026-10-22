@@ -286,8 +286,8 @@ async function createOnlineRoom() {
     render();
     message('온라인 방을 만들었습니다. 친구에게 방 코드를 보내세요.');
   } catch (e) {
-    roomStatus('방 만들기 실패: ' + e.message);
-  }
+roomStatus('방 만들기 실패: ' + (e?.stack || e?.message || String(e)));
+console.error('방 만들기 오류:', e);  }
 }
 
 async function joinOnlineRoom() {
