@@ -361,10 +361,7 @@ async function leaveOnlineRoom() {
 
   render();
 }
- stopRoomListener();onlineMode=false;roomCode=null;myPlayerId=null;roomHostId=null;
- $('count').disabled=false;$('reset').disabled=false;$('copyRoom').disabled=true;$('leaveRoom').disabled=true;
- roomStatus('방 연결을 종료했습니다. 로컬 게임으로 돌아왔어요.');
- setup();
+ 
 }
 
 function current(){return players[turn]}
