@@ -99,97 +99,268 @@ function stockCrash(p,forced=false){
  }
  message(text,'crash');render();showCrash('📉 '+st.name+' 주식 폭락!',text+' (게임용 가상 이벤트)');
 }
+function roomStatus(t) {
+  $('roomStatus').textContent = t;
+}
 
-function roomStatus(t){$('roomStatus').textContent=t}
-function newCode(){return Math.random().toString(36).slice(2,8).toUpperCase()}
-function packState(){return {players,turn,rolled,finished,logItems,spaces:spaces.map(s=>({owner:s.owner??null})),updatedAt:Date.now()}}
-function applyState(st){
- if(!st||!Array.isArray(st.players))return;
- applyingRemote=true;
- players=st.players;turn=st.turn||0;rolled=!!st.rolled;finished=!!st.finished;logItems=st.logItems||[];
- if(Array.isArray(st.spaces))st.spaces.forEach((x,i)=>{if(spaces[i])spaces[i].owner=x.owner??null});
- render();
- if(logItems.length)$('log').innerHTML=logItems.map(x=>`<div>${x}</div>`).join('');
- applyingRemote=false;
+function newCode() {
+  return Math.random().toString(36).slice(2, 8).toUpperCase();
 }
-async function saveOnlineState(){
- if(!onlineMode||!db||!roomCode||applyingRemote)return;
- try{await set(ref(db,`rooms/${roomCode}/state`),packState())}
- catch(e){roomStatus('동기화 오류: '+e.message)}
+
+function packState() {
+  return {
+    players, turn, rolled, finished, logItems,
+    spaces: spaces.map(s => ({ owner: s.owner ?? null })),
+    updatedAt: Date.now()
+  };
 }
-async function onlineLogin(){
- if(!configReady)throw new Error('Firebase 설정이 아직 비어 있어요. 함께 제공된 설정 안내를 먼저 따라 해 주세요.');
- if(!auth)throw new Error('Firebase 인증을 초기화하지 못했습니다.');
- const cred=await signInAnonymously(auth);myPlayerId=cred.user.uid;return myPlayerId;
+
+function applyState(st) {
+  if (!st || !Array.isArray(st.players)) return;
+
+  applyingRemote = true;
+  try {
+    players = st.players;
+    turn = st.turn || 0;
+    rolled = !!st.rolled;
+    finished = !!st.finished;
+    logItems = st.logItems || [];
+
+    if (Array.isArray(st.spaces)) {
+      st.spaces.forEach((x, i) => {
+        if (spaces[i]) spaces[i].owner = x.owner ?? null;
+      });
+    }
+
+    render();
+    if ($('log')) {
+      $('log').innerHTML = logItems.map(x => `<div>${x}</div>`).join('');
+    }
+    updateOnlineControls();
+  } finally {
+    applyingRemote = false;
+  }
 }
-function stopRoomListener(){if(roomUnsubscribe){roomUnsubscribe();roomUnsubscribe=null}}
-async function createOnlineRoom(){
- try{
-  await onlineLogin();stopRoomListener();roomCode=newCode();onlineMode=true;roomHostId=myPlayerId;
-  const name=($('playerName').value.trim()||'플레이어').slice(0,16);
-  players=[{name,money:100,pos:0,owned:[],emoji:'🔵',out:false,uid:myPlayerId}];
-  turn=0;rolled=false;finished=false;logItems=[];
-  spaces.forEach(s=>s.owner=null);
-  const room={hostId:roomHostId,members:{[myPlayerId]:{name}},state:packState(),createdAt:Date.now()};
-  await set(ref(db,`rooms/${roomCode}`),room);
-  listenToRoom();
-  $('roomInput').value=roomCode;$('copyRoom').disabled=false;$('leaveRoom').disabled=false;
-  roomStatus(`방 코드: ${roomCode} · 친구가 참가할 때까지 기다리는 중`);
-  $('onlineHelp').textContent='방 코드를 친구에게 보내세요. 최대 4명이 참가할 수 있습니다.';
-  $('count').disabled=true;$('reset').disabled=true;
-  render();message('온라인 방을 만들었습니다. 친구가 참가하면 게임을 시작하세요.');
- }catch(e){roomStatus('방 만들기 실패: '+e.message)}
+
+async function saveOnlineState() {
+  if (!onlineMode || !syncAction || applyingRemote) return;
+
+  try {
+    await syncAction.send({
+      type: 'state',
+      state: packState()
+    });
+  } catch (e) {
+    roomStatus('동기화 오류: ' + e.message);
+  }
 }
-async function joinOnlineRoom(){
- try{
-  await onlineLogin();stopRoomListener();
-  const code=$('roomInput').value.trim().toUpperCase();
-  if(!/^[A-Z0-9]{6}$/.test(code))throw new Error('방 코드는 영문/숫자 6자리로 입력해 주세요.');
-  const name=($('playerName').value.trim()||'플레이어').slice(0,16);
-  const roomRef=ref(db,`rooms/${code}`);
-  const result=await runTransaction(roomRef,room=>{
-   if(!room||!room.state||!Array.isArray(room.state.players))return;
-   if(room.members&&room.members[myPlayerId])return room;
-   if(room.state.players.length>=4)return;
-   const idx=room.state.players.length;
-   const p={name,money:100,pos:0,owned:[],emoji:['🔵','🔴','🟣','🟢'][idx%4],out:false,uid:myPlayerId};
-   room.state.players.push(p);
-   room.members=room.members||{};room.members[myPlayerId]={name};
-   room.state.logItems=room.state.logItems||[];
-   room.state.logItems.unshift(`${name}이(가) 방에 참가했습니다.`);
-   room.state.logItems=room.state.logItems.slice(0,14);
-   return room;
-  });
-  if(!result.committed||!result.snapshot.exists())throw new Error('방을 찾을 수 없거나 이미 4명이 참가했어요.');
-  roomCode=code;onlineMode=true;
-  const room=result.snapshot.val();roomHostId=room.hostId;
-  listenToRoom();$('copyRoom').disabled=false;$('leaveRoom').disabled=false;
-  $('count').disabled=true;$('reset').disabled=true;
-  roomStatus(`방 ${code}에 참가했습니다. 플레이어 ${room.state.players.length}/4명`);
-  $('onlineHelp').textContent='모든 플레이어는 각자 자기 기기에서 참가합니다. 현재 차례인 사람만 주사위를 굴릴 수 있어요.';
-  applyState(room.state);message(`${name} 참가 완료! 방장과 친구가 준비되면 플레이하세요.`);
- }catch(e){roomStatus('참가 실패: '+e.message)}
+
+async function onlineLogin() {
+  myPlayerId = selfId;
+  return myPlayerId;
 }
-function listenToRoom(){
- stopRoomListener();
- roomUnsubscribe=onValue(ref(db,`rooms/${roomCode}`),snap=>{
-  if(!snap.exists()){roomStatus('방이 종료되었거나 존재하지 않습니다.');return}
-  const room=snap.val();roomHostId=room.hostId;
-  if(room.state)applyState(room.state);
-  const count=room.state?.players?.length||0;
-  roomStatus(`방 코드: ${roomCode} · 참가자 ${count}/4명${myPlayerId===roomHostId?' · 방장':''}`);
-  $('copyRoom').disabled=false;$('leaveRoom').disabled=false;
-  updateOnlineControls();
- },e=>roomStatus('실시간 연결 오류: '+e.message));
+
+function stopRoomListener() {
+  if (onlineRoom) {
+    try {
+      onlineRoom.leave();
+    } catch (e) {
+      console.warn(e);
+    }
+  }
+  onlineRoom = null;
+  syncAction = null;
 }
-function updateOnlineControls(){
- const p=players[turn],isMyTurn=!!p&&p.uid===myPlayerId;
- $('roll').disabled=finished||rolled||(onlineMode&&!isMyTurn);
- $('buy').disabled=finished||!rolled||(onlineMode&&!isMyTurn)||!p||spaces[p.pos].type!=='asset'||spaces[p.pos].owner!==null||p.money<spaces[p.pos].price;
- $('end').disabled=finished||!rolled||(onlineMode&&!isMyTurn);
- if(onlineMode&&!isMyTurn&&!finished) $('turnLabel').textContent += ' · 다른 플레이어 차례';
+
+function startP2PRoom(code, host) {
+  onlineRoom = joinRoom(
+    { appId: 'korea-boardgame-2026' },
+    code
+  );
+
+  syncAction = onlineRoom.makeAction('game-state');
+
+  syncAction.onMessage = (data, { peerId }) => {
+    if (!data || typeof data !== 'object') return;
+
+    if (data.type === 'join' && isHost) {
+      if (players.some(p => p.uid === peerId)) {
+        syncAction.send(
+          { type: 'state', state: packState() },
+          { target: peerId }
+        );
+        return;
+      }
+
+      if (players.length >= 4) {
+        roomStatus('방이 가득 찼습니다. 최대 4명까지 참가할 수 있어요.');
+        return;
+      }
+
+      const name = String(data.name || '플레이어').slice(0, 16);
+      const emoji = ['🔵', '🔴', '🟣', '🟢'][players.length % 4];
+
+      players.push({
+        name,
+        money: 100,
+        pos: 0,
+        owned: [],
+        emoji,
+        out: false,
+        uid: peerId
+      });
+
+      logItems.unshift(`${name}이(가) 방에 참가했습니다.`);
+      logItems = logItems.slice(0, 14);
+
+      render();
+      saveOnlineState();
+      roomStatus(`방 코드: ${roomCode} · 참가자 ${players.length}/4명`);
+      return;
+    }
+
+    if (data.type === 'state' && data.state) {
+      applyState(data.state);
+      const count = players.length;
+      roomStatus(`방 코드: ${roomCode} · 참가자 ${count}/4명`);
+    }
+  };
+
+  onlineRoom.onPeerJoin = peerId => {
+    if (isHost) {
+      syncAction.send(
+        { type: 'state', state: packState() },
+        { target: peerId }
+      );
+    } else {
+      const name = ($('playerName').value.trim() || '플레이어').slice(0, 16);
+      syncAction.send({ type: 'join', name });
+    }
+  };
+
+  onlineRoom.onPeerLeave = () => {
+    roomStatus(`방 코드: ${roomCode} · 연결이 끊긴 참가자가 있습니다.`);
+  };
 }
-async function leaveOnlineRoom(){
+
+async function createOnlineRoom() {
+  try {
+    stopRoomListener();
+    await onlineLogin();
+
+    roomCode = newCode();
+    onlineMode = true;
+    isHost = true;
+    roomHostId = myPlayerId;
+
+    const name = ($('playerName').value.trim() || '플레이어').slice(0, 16);
+
+    players = [{
+      name,
+      money: 100,
+      pos: 0,
+      owned: [],
+      emoji: '🔵',
+      out: false,
+      uid: myPlayerId
+    }];
+
+    turn = 0;
+    rolled = false;
+    finished = false;
+    logItems = [];
+    spaces.forEach(s => s.owner = null);
+
+    startP2PRoom(roomCode, true);
+
+    $('roomInput').value = roomCode;
+    $('copyRoom').disabled = false;
+    $('leaveRoom').disabled = false;
+    $('count').disabled = true;
+    $('reset').disabled = true;
+
+    roomStatus(`방 코드: ${roomCode} · 친구 참가 대기 중`);
+    $('onlineHelp').textContent =
+      '방 코드를 친구에게 보내세요. 최대 4명이 참가할 수 있습니다.';
+
+    render();
+    message('온라인 방을 만들었습니다. 친구에게 방 코드를 보내세요.');
+  } catch (e) {
+    roomStatus('방 만들기 실패: ' + e.message);
+  }
+}
+
+async function joinOnlineRoom() {
+  try {
+    stopRoomListener();
+    await onlineLogin();
+
+    const code = $('roomInput').value.trim().toUpperCase();
+
+    if (!/^[A-Z0-9]{6}$/.test(code)) {
+      throw new Error('방 코드는 영문/숫자 6자리로 입력해 주세요.');
+    }
+
+    roomCode = code;
+    onlineMode = true;
+    isHost = false;
+    roomHostId = null;
+
+    startP2PRoom(roomCode, false);
+
+    $('copyRoom').disabled = false;
+    $('leaveRoom').disabled = false;
+    $('count').disabled = true;
+    $('reset').disabled = true;
+
+    roomStatus(`방 ${code} 연결 중…`);
+    $('onlineHelp').textContent =
+      '방장과 연결될 때까지 기다려 주세요. 같은 방 코드여야 합니다.';
+
+    message('방 연결을 시도하고 있습니다.');
+  } catch (e) {
+    roomStatus('참가 실패: ' + e.message);
+  }
+}
+
+function updateOnlineControls() {
+  const p = players[turn];
+  const isMyTurn = !!p && p.uid === myPlayerId;
+
+  $('roll').disabled = finished || rolled || (onlineMode && !isMyTurn);
+
+  $('buy').disabled =
+    finished ||
+    !rolled ||
+    (onlineMode && !isMyTurn) ||
+    !p ||
+    !spaces[p.pos] ||
+    spaces[p.pos].type !== 'asset' ||
+    spaces[p.pos].owner !== null ||
+    p.money < spaces[p.pos].price;
+
+  $('end').disabled = finished || !rolled || (onlineMode && !isMyTurn);
+}
+
+async function leaveOnlineRoom() {
+  stopRoomListener();
+
+  onlineMode = false;
+  isHost = false;
+  roomCode = null;
+  roomHostId = null;
+  applyingRemote = false;
+
+  $('copyRoom').disabled = true;
+  $('leaveRoom').disabled = true;
+  $('count').disabled = false;
+  $('reset').disabled = false;
+
+  roomStatus('온라인 방에서 나왔습니다.');
+  $('onlineHelp').textContent = '방을 만들거나 방 코드로 참가하세요.';
+
+  render();
+}
  stopRoomListener();onlineMode=false;roomCode=null;myPlayerId=null;roomHostId=null;
  $('count').disabled=false;$('reset').disabled=false;$('copyRoom').disabled=true;$('leaveRoom').disabled=true;
  roomStatus('방 연결을 종료했습니다. 로컬 게임으로 돌아왔어요.');
