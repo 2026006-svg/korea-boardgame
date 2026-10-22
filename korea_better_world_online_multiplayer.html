@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>대한민국: 더 나은 세상 보드게임</title>
+<style>
+:root{--navy:#132b45;--blue:#2e6f95;--mint:#dff5ec;--gold:#f6c85f;--paper:#f7f4ec;--ink:#203040;--red:#d95d59}*{box-sizing:border-box}body{margin:0;background:linear-gradient(140deg,#e8f3f5,#f7f4ec);font-family:system-ui,-apple-system,'Malgun Gothic',sans-serif;color:var(--ink)}header{background:var(--navy);color:white;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}header h1{font-size:clamp(20px,3vw,30px);margin:0}header p{margin:5px 0 0;color:#c8dce8;font-size:13px}.wrap{max-width:1250px;margin:auto;padding:16px;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.8fr);gap:16px}.board{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-template-rows:repeat(7,minmax(78px,1fr));gap:6px;background:#c9d8d6;padding:8px;border-radius:16px;min-height:650px;box-shadow:0 12px 32px #17334a18}.tile{background:white;border:2px solid #d8e4e0;border-radius:10px;padding:7px 5px;display:flex;flex-direction:column;justify-content:space-between;text-align:center;min-width:0;position:relative;font-size:12px;overflow:hidden}.tile .emoji{font-size:22px}.tile strong{font-size:12px;line-height:1.25}.tile small{color:#5b6c78;font-size:10px}.tile .price{font-weight:800;color:#225c76}.tile.start{background:#e2f5d7;border-color:#79b76c}.tile.asset{border-top:5px solid #4e9f87}.tile.risk{background:#fff0ee;border-color:#efb6b0}.tile.event{background:#fff7dc;border-color:#efd17b}.tile.special{background:#eaf1ff;border-color:#b5c8ee}.tile.active{outline:4px solid #f0a92f;outline-offset:1px;z-index:2;animation:tilePulse .8s infinite alternate}@keyframes tilePulse{from{box-shadow:0 0 0 1px #f0a92f55;transform:translateY(0)}to{box-shadow:0 0 0 6px #f0a92f88;transform:translateY(-3px)}}.rolling{animation:diceRoll .65s ease-in-out}@keyframes diceRoll{0%{transform:rotate(0) scale(1)}25%{transform:rotate(90deg) scale(1.12)}50%{transform:rotate(180deg) scale(.9)}75%{transform:rotate(270deg) scale(1.12)}100%{transform:rotate(360deg) scale(1)}}.status.crash{background:#fff0f0;border:1px solid #e79a9a;animation:shake .45s}@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}.modal-overlay{position:fixed;inset:0;background:#102033cc;display:none;place-items:center;padding:16px;z-index:20}.modal-overlay.show{display:grid}.modal{background:white;border-radius:22px;padding:24px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 70px #0005;animation:modalPop .35s cubic-bezier(.2,.8,.2,1)}.modal .big{font-size:3.2rem}.modal h2{margin:8px 0}.modal p{line-height:1.55}@keyframes modalPop{from{opacity:0;transform:scale(.72) translateY(18px)}to{opacity:1;transform:scale(1) translateY(0)}}.tile .pawns{display:flex;justify-content:center;gap:2px;font-size:15px}.center{grid-column:2/7;grid-row:2/7;background:#f9fcfa;border-radius:13px;padding:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px}.center h2{margin:0;color:var(--navy);font-size:clamp(18px,2vw,27px)}.center p{max-width:420px;font-size:13px;line-height:1.55;margin:0}.pill{background:#e3f0ef;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:700}.panel{display:flex;flex-direction:column;gap:12px}.card{background:white;border-radius:14px;padding:15px;box-shadow:0 5px 18px #17334a0c;border:1px solid #e0e8e6}.card h3{margin:0 0 10px;font-size:16px;color:var(--navy)}.players{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.player{border:1px solid #dce6e5;border-radius:10px;padding:9px;font-size:12px}.player.current{border:2px solid #e9ae34;background:#fffbec}.player b{display:block;font-size:13px;margin-bottom:4px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}button,select{border:0;border-radius:9px;padding:11px 10px;font:inherit;font-weight:750;cursor:pointer}button{background:var(--blue);color:white}button.secondary{background:#e9f0f2;color:#23465b}button:disabled{opacity:.45;cursor:not-allowed}.bigbtn{grid-column:1/-1;background:var(--navy);font-size:15px}.status{background:#f6f9fa;border-radius:10px;padding:12px;min-height:88px;font-size:13px;line-height:1.55}.log{font-size:12px;line-height:1.55;max-height:160px;overflow:auto;color:#51616b}.log div{padding:5px 0;border-bottom:1px solid #edf1f1}.rules{font-size:12px;line-height:1.6;color:#4b5d68}.setup{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}.setup select{background:#eef4f5;color:var(--ink)}.foot{max-width:1250px;margin:0 auto;padding:0 16px 20px;color:#647780;font-size:11px}@media(max-width:850px){.wrap{grid-template-columns:1fr}.board{min-height:560px;grid-template-rows:repeat(7,minmax(65px,1fr))}}@media(max-width:500px){.wrap{padding:8px;gap:10px}.board{gap:3px;padding:4px;min-height:470px}.tile{padding:4px 2px}.tile .emoji{font-size:17px}.tile strong{font-size:10px}.tile small{font-size:9px}.tile .price{font-size:10px}.center{padding:5px;gap:5px}.center p{font-size:10px}.center h2{font-size:15px}}
+</style></head>
+<body><header><div><h1>🇰🇷 대한민국: 더 나은 세상</h1><p>자산을 키우고 위기를 함께 극복하는 한국 테마 부루마블</p></div><div class="setup">인원 <select id="count"><option>2</option><option>3</option><option selected>4</option></select>명 <button class="secondary" id="reset">새 게임</button></div></header>
+<main class="wrap"><section class="board" id="board"></section><aside class="panel">
+<div class="card"><h3>🌐 온라인 멀티플레이</h3>
+<div class="rules" id="onlineHelp">방을 만들고 코드를 친구에게 보내면 각자 다른 기기에서 같은 게임에 참여할 수 있어요. 온라인 기능은 Firebase 설정이 필요합니다.</div>
+<div style="display:grid;gap:8px;margin-top:10px">
+<input id="playerName" maxlength="16" placeholder="내 닉네임" value="플레이어" style="padding:11px;border:1px solid #dce6e5;border-radius:9px;font:inherit">
+<button id="createRoom">방 만들기</button>
+<div style="display:flex;gap:7px"><input id="roomInput" maxlength="6" placeholder="방 코드 6자리" style="min-width:0;flex:1;padding:11px;border:1px solid #dce6e5;border-radius:9px;font:inherit;text-transform:uppercase"><button id="joinRoom">참가</button></div>
+<div id="roomStatus" class="status" style="min-height:55px">아직 온라인 방에 연결되지 않았어요.</div>
+<button id="copyRoom" class="secondary" disabled>📋 방 코드 복사</button>
+<button id="leaveRoom" class="secondary" disabled>방 나가기</button>
+</div></div>
+<div class="card"><h3>🎲 게임 진행</h3><div id="turnLabel" style="font-weight:800;margin-bottom:8px">1번 플레이어 차례</div><div class="status" id="status">주사위를 굴려 출발하세요. 자산 칸을 매입하고 이벤트에 대응하세요!</div><div class="actions" style="margin-top:10px"><button class="bigbtn" id="roll">🎲 주사위 굴리기</button><button id="buy" disabled>자산 매입</button><button class="secondary" id="end" disabled>턴 종료</button></div></div>
+<div class="card"><h3>👥 플레이어 현황</h3><div class="players" id="players"></div></div>
+<div class="card"><h3>📜 최근 기록</h3><div class="log" id="log">게임이 시작되면 기록이 여기에 표시됩니다.</div></div>
+<div class="card"><h3>📖 간단 규칙</h3><div class="rules">• 모든 플레이어는 100만 원으로 시작합니다.<br>• 주사위 숫자만큼 이동합니다. 출발점을 지나면 20만 원을 받습니다.<br>• 비어 있는 자산은 매입할 수 있고, 다른 사람의 자산에 도착하면 통행료를 냅니다.<br>• 위기·이벤트 칸은 돈을 얻거나 잃을 수 있습니다.<br>• 초록우산 칸은 사회환원 기부를 선택할 수 있습니다.<br>• 마지막까지 자산을 잘 관리해 가장 많은 재산을 모으세요.</div></div></aside></main><div class="modal-overlay" id="crashModal"><div class="modal"><div class="big">📉</div><h2 id="crashTitle">주식 폭락!</h2><p id="crashText"></p><button id="closeCrash">확인</button></div></div><div class="foot">학습용 가상 게임입니다. 기업·국가 관련 사건과 금액은 게임 규칙에 맞게 단순화했으며 실제 주가나 투자 조언이 아닙니다.</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+import { getDatabase, ref, get, set, update, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+
+// Firebase Console에서 발급받은 설정을 아래 객체에 넣어야 온라인 기능이 작동합니다.
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT_ID",
+  appId: "YOUR_APP_ID"
+};
+let db = null, auth = null, myPlayerId = null, roomCode = null, roomUnsubscribe = null;
+let onlineMode = false, applyingRemote = false, roomHostId = null;
+const configReady = !Object.values(firebaseConfig).some(v => String(v).includes("YOUR_"));
+if (configReady) {
+  const app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getDatabase(app);
+}
+const spaces=[
+{name:'출발',emoji:'🏁',type:'start',desc:'출발점을 지날 때마다 +20만 원'},
+{name:'경주 문화유산',emoji:'🏛️',type:'asset',price:20,fee:5,desc:'문화유산 보존 자산'},
+{name:'찬스 카드',emoji:'🎴',type:'event'},
+{name:'삼성전자',emoji:'💾',type:'asset',price:35,fee:8,desc:'AI 반도체 자산'},
+{name:'반도체 경쟁 위기',emoji:'📉',type:'risk',desc:'경쟁 심화로 비용 발생'},
+{name:'첨성대·천마총',emoji:'🌙',type:'asset',price:20,fee:5,desc:'역사·관광 자산'},
+{name:'사회환원: 초록우산',emoji:'💚',type:'special',desc:'기부를 선택할 수 있음'},
+{name:'네이버',emoji:'🔎',type:'asset',price:30,fee:7,desc:'AI·쇼핑 플랫폼 자산'},
+{name:'찬스 카드',emoji:'🎴',type:'event'},
+{name:'경부고속도로',emoji:'🛣️',type:'asset',price:25,fee:6,desc:'교통 인프라'},
+{name:'국가 비상 상황',emoji:'🚨',type:'risk',desc:'안보 위기 대응 비용'},
+{name:'SK하이닉스',emoji:'🧠',type:'asset',price:35,fee:8,desc:'고성능 메모리 자산'},
+{name:'누리호 발사',emoji:'🚀',type:'special',desc:'우주산업 발전 보상'},
+{name:'LG전자',emoji:'🏠',type:'asset',price:25,fee:6,desc:'가전·자동차 부품 자산'},
+{name:'찬스 카드',emoji:'🎴',type:'event'},
+{name:'AI 데이터센터',emoji:'🖥️',type:'asset',price:30,fee:7,desc:'디지털 기반시설'},
+{name:'물류비 상승',emoji:'📦',type:'risk',desc:'기업 비용 증가 위기'},
+{name:'한글·문화 콘텐츠',emoji:'🎬',type:'asset',price:20,fee:5,desc:'문화산업 자산'},
+{name:'사회적 기업 지원',emoji:'🤝',type:'special',desc:'사회적 가치 보상'},
+{name:'찬스 카드',emoji:'🎴',type:'event'},
+{name:'재생에너지 단지',emoji:'🌱',type:'asset',price:25,fee:6,desc:'지속가능한 에너지 자산'},
+{name:'글로벌 경기 불안',emoji:'🌍',type:'risk',desc:'세계 경제 위기'},
+{name:'부산 항만',emoji:'🚢',type:'asset',price:25,fee:6,desc:'수출·물류 자산'},
+{name:'공동체 회복',emoji:'🫶',type:'special',desc:'협력 보상'}
+];
+const colors=['#2e86ab','#d95d59','#8a65b5','#3a9d77'];let players=[],turn=0,rolled=false,finished=false,logItems=[];const $=id=>document.getElementById(id);const won=n=>`${n}만 원`;
+function setup(){let n=+$('count').value;players=Array.from({length:n},(_,i)=>({name:`플레이어 ${i+1}`,money:100,pos:0,owned:[],emoji:['🔵','🔴','🟣','🟢'][i],out:false,uid:null}));spaces.forEach(s=>s.owner=null);turn=0;rolled=false;finished=false;logItems=[];log('새 게임 시작! 모든 플레이어가 100만 원을 받았습니다.');render();message('주사위를 굴려 출발하세요. 자산 칸을 매입하고 이벤트에 대응하세요!')}
+function log(t){logItems.unshift(t);logItems=logItems.slice(0,14);if($('log'))$('log').innerHTML=logItems.map(x=>`<div>${x}</div>`).join('')}
+function message(t,type=''){$('status').textContent=t;$('status').className='status '+type}
+function showCrash(title,text){$('crashTitle').textContent=title;$('crashText').textContent=text;$('crashModal').classList.add('show')}
+$('closeCrash').addEventListener('click',()=>$('crashModal').classList.remove('show'));
+function stockCrash(p,forced=false){
+ const stocks=[
+  {name:'삼성전자',label:'반도체 경쟁 심화',loss:18},
+  {name:'SK하이닉스',label:'AI 메모리 수요 둔화 우려',loss:20},
+  {name:'네이버',label:'AI 투자 비용 부담',loss:15},
+  {name:'LG전자',label:'원자재·물류비 상승',loss:12}
+ ];
+ const st=stocks[Math.floor(Math.random()*stocks.length)];
+ const owned=spaces.find(s=>s.name===st.name);
+ let text='';
+ if(owned&&owned.owner!==null){
+   const owner=players[owned.owner];
+   const loss=Math.min(owner.money,st.loss);
+   owner.money-=loss;
+   text=`${st.name} 폭락! ${st.label} 때문에 ${owner.name}의 자금 ${loss}만 원이 감소했습니다.`;
+   log(`📉 주식 폭락: ${text}`);
+ }else{
+   const loss=Math.min(p.money,st.loss);
+   p.money-=loss;
+   text=`${st.name} 폭락! ${st.label}. 아직 해당 자산의 주인이 없어, 현재 플레이어가 시장 충격 비용 ${loss}만 원을 부담합니다.`;
+   log(`📉 주식 폭락: ${text}`);
+ }
+ message(text,'crash');render();showCrash('📉 '+st.name+' 주식 폭락!',text+' (게임용 가상 이벤트)');
+}
+
+function roomStatus(t){$('roomStatus').textContent=t}
+function newCode(){return Math.random().toString(36).slice(2,8).toUpperCase()}
+function packState(){return {players,turn,rolled,finished,logItems,spaces:spaces.map(s=>({owner:s.owner??null})),updatedAt:Date.now()}}
+function applyState(st){
+ if(!st||!Array.isArray(st.players))return;
+ applyingRemote=true;
+ players=st.players;turn=st.turn||0;rolled=!!st.rolled;finished=!!st.finished;logItems=st.logItems||[];
+ if(Array.isArray(st.spaces))st.spaces.forEach((x,i)=>{if(spaces[i])spaces[i].owner=x.owner??null});
+ render();
+ if(logItems.length)$('log').innerHTML=logItems.map(x=>`<div>${x}</div>`).join('');
+ applyingRemote=false;
+}
+async function saveOnlineState(){
+ if(!onlineMode||!db||!roomCode||applyingRemote)return;
+ try{await set(ref(db,`rooms/${roomCode}/state`),packState())}
+ catch(e){roomStatus('동기화 오류: '+e.message)}
+}
+async function onlineLogin(){
+ if(!configReady)throw new Error('Firebase 설정이 아직 비어 있어요. 함께 제공된 설정 안내를 먼저 따라 해 주세요.');
+ if(!auth)throw new Error('Firebase 인증을 초기화하지 못했습니다.');
+ const cred=await signInAnonymously(auth);myPlayerId=cred.user.uid;return myPlayerId;
+}
+function stopRoomListener(){if(roomUnsubscribe){roomUnsubscribe();roomUnsubscribe=null}}
+async function createOnlineRoom(){
+ try{
+  await onlineLogin();stopRoomListener();roomCode=newCode();onlineMode=true;roomHostId=myPlayerId;
+  const name=($('playerName').value.trim()||'플레이어').slice(0,16);
+  players=[{name,money:100,pos:0,owned:[],emoji:'🔵',out:false,uid:myPlayerId}];
+  turn=0;rolled=false;finished=false;logItems=[];
+  spaces.forEach(s=>s.owner=null);
+  const room={hostId:roomHostId,members:{[myPlayerId]:{name}},state:packState(),createdAt:Date.now()};
+  await set(ref(db,`rooms/${roomCode}`),room);
+  listenToRoom();
+  $('roomInput').value=roomCode;$('copyRoom').disabled=false;$('leaveRoom').disabled=false;
+  roomStatus(`방 코드: ${roomCode} · 친구가 참가할 때까지 기다리는 중`);
+  $('onlineHelp').textContent='방 코드를 친구에게 보내세요. 최대 4명이 참가할 수 있습니다.';
+  $('count').disabled=true;$('reset').disabled=true;
+  render();message('온라인 방을 만들었습니다. 친구가 참가하면 게임을 시작하세요.');
+ }catch(e){roomStatus('방 만들기 실패: '+e.message)}
+}
+async function joinOnlineRoom(){
+ try{
+  await onlineLogin();stopRoomListener();
+  const code=$('roomInput').value.trim().toUpperCase();
+  if(!/^[A-Z0-9]{6}$/.test(code))throw new Error('방 코드는 영문/숫자 6자리로 입력해 주세요.');
+  const name=($('playerName').value.trim()||'플레이어').slice(0,16);
+  const roomRef=ref(db,`rooms/${code}`);
+  const result=await runTransaction(roomRef,room=>{
+   if(!room||!room.state||!Array.isArray(room.state.players))return;
+   if(room.members&&room.members[myPlayerId])return room;
+   if(room.state.players.length>=4)return;
+   const idx=room.state.players.length;
+   const p={name,money:100,pos:0,owned:[],emoji:['🔵','🔴','🟣','🟢'][idx%4],out:false,uid:myPlayerId};
+   room.state.players.push(p);
+   room.members=room.members||{};room.members[myPlayerId]={name};
+   room.state.logItems=room.state.logItems||[];
+   room.state.logItems.unshift(`${name}이(가) 방에 참가했습니다.`);
+   room.state.logItems=room.state.logItems.slice(0,14);
+   return room;
+  });
+  if(!result.committed||!result.snapshot.exists())throw new Error('방을 찾을 수 없거나 이미 4명이 참가했어요.');
+  roomCode=code;onlineMode=true;
+  const room=result.snapshot.val();roomHostId=room.hostId;
+  listenToRoom();$('copyRoom').disabled=false;$('leaveRoom').disabled=false;
+  $('count').disabled=true;$('reset').disabled=true;
+  roomStatus(`방 ${code}에 참가했습니다. 플레이어 ${room.state.players.length}/4명`);
+  $('onlineHelp').textContent='모든 플레이어는 각자 자기 기기에서 참가합니다. 현재 차례인 사람만 주사위를 굴릴 수 있어요.';
+  applyState(room.state);message(`${name} 참가 완료! 방장과 친구가 준비되면 플레이하세요.`);
+ }catch(e){roomStatus('참가 실패: '+e.message)}
+}
+function listenToRoom(){
+ stopRoomListener();
+ roomUnsubscribe=onValue(ref(db,`rooms/${roomCode}`),snap=>{
+  if(!snap.exists()){roomStatus('방이 종료되었거나 존재하지 않습니다.');return}
+  const room=snap.val();roomHostId=room.hostId;
+  if(room.state)applyState(room.state);
+  const count=room.state?.players?.length||0;
+  roomStatus(`방 코드: ${roomCode} · 참가자 ${count}/4명${myPlayerId===roomHostId?' · 방장':''}`);
+  $('copyRoom').disabled=false;$('leaveRoom').disabled=false;
+  updateOnlineControls();
+ },e=>roomStatus('실시간 연결 오류: '+e.message));
+}
+function updateOnlineControls(){
+ const p=players[turn],isMyTurn=!!p&&p.uid===myPlayerId;
+ $('roll').disabled=finished||rolled||(onlineMode&&!isMyTurn);
+ $('buy').disabled=finished||!rolled||(onlineMode&&!isMyTurn)||!p||spaces[p.pos].type!=='asset'||spaces[p.pos].owner!==null||p.money<spaces[p.pos].price;
+ $('end').disabled=finished||!rolled||(onlineMode&&!isMyTurn);
+ if(onlineMode&&!isMyTurn&&!finished) $('turnLabel').textContent += ' · 다른 플레이어 차례';
+}
+async function leaveOnlineRoom(){
+ stopRoomListener();onlineMode=false;roomCode=null;myPlayerId=null;roomHostId=null;
+ $('count').disabled=false;$('reset').disabled=false;$('copyRoom').disabled=true;$('leaveRoom').disabled=true;
+ roomStatus('방 연결을 종료했습니다. 로컬 게임으로 돌아왔어요.');
+ setup();
+}
+
+function current(){return players[turn]}
+function render(){const board=$('board');board.innerHTML='<div class="center"><div class="pill">자산 · 위기 · 공동체</div><h2>더 나은 대한민국 만들기</h2><p>문화유산과 첨단산업을 키우고, 안보·경제 위기를 함께 극복하세요. 자산을 매입하고 통행료를 모아 가장 튼튼한 경제를 만들어 보세요.</p><div style="font-size:30px">🏛️ 💾 🚀 🌱</div><small>2~4인 로컬 멀티플레이 · 한 기기에서 번갈아 플레이</small></div>';
+const coords=[[7,7],[7,6],[7,5],[7,4],[7,3],[7,2],[7,1],[6,1],[5,1],[4,1],[3,1],[2,1],[1,1],[1,2],[1,3],[1,4],[1,5],[1,6],[1,7],[2,7],[3,7],[4,7],[5,7],[6,7]];
+spaces.forEach((s,i)=>{let d=document.createElement('div');d.className='tile '+s.type+(i===current().pos?' active':'');d.style.gridRow=coords[i][0];d.style.gridColumn=coords[i][1];let owner=s.owner!==null?`<small>소유: ${players[s.owner]?.name||'플레이어'}</small>`:'';let pawns=players.filter(p=>p.pos===i).map(p=>`<span title="${p.name}">${p.emoji}</span>`).join('');d.innerHTML=`<div class="emoji">${s.emoji}</div><strong>${s.name}</strong><small>${s.type==='asset'?'매입 '+won(s.price):s.type==='start'?'보너스':s.type==='risk'?'위기':s.type==='event'?'찬스':s.type==='special'?'특수 칸':''}</small>${s.type==='asset'?`<div class="price">통행료 ${won(s.fee)}</div>`:''}${owner}<div class="pawns">${pawns}</div>`;board.appendChild(d)});
+let c=current();$('turnLabel').textContent=finished?'게임 종료':`${c.emoji} ${c.name} 차례`; $('players').innerHTML=players.map((p,i)=>`<div class="player ${i===turn&&!finished?'current':''}"><b>${p.emoji} ${p.name}</b>잔액: ${won(p.money)}<br>자산: ${p.owned.length}개<br>순자산: ${won(p.money+p.owned.reduce((a,j)=>a+(spaces[j].price||0),0))}</div>`).join('');$('roll').disabled=rolled||finished;$('buy').disabled=!rolled||finished||spaces[c.pos].type!=='asset'||spaces[c.pos].owner!==null||c.money<spaces[c.pos].price;$('end').disabled=!rolled||finished;if(onlineMode)updateOnlineControls();}
+function move(){if(rolled||finished||(onlineMode&&current()?.uid!==myPlayerId))return;rolled=true;let p=current(),old=p.pos;
+ const rollBtn=$('roll');rollBtn.disabled=true;rollBtn.textContent='🎲 굴리는 중...';
+ let count=0;const faces=['⚀','⚁','⚂','⚃','⚄','⚅'];
+ const status=$('status');status.classList.remove('crash');
+ const spin=setInterval(()=>{rollBtn.textContent=faces[Math.floor(Math.random()*6)];count++;if(count>=8){clearInterval(spin);const d=Math.floor(Math.random()*6)+1;rollBtn.textContent='🎲 주사위 굴리기';rollBtn.disabled=false;resolveMove(p,d,old)}},65)}
+function resolveMove(p,d,old){p.pos=(p.pos+d)%spaces.length;if(old+d>=spaces.length){p.money+=20;log(`${p.name}: 출발점 통과 +20만 원`)}let s=spaces[p.pos];let msg=`${p.name}이(가) ${d}칸 이동해 [${s.name}]에 도착했습니다. `;
+if(s.type==='asset'){if(s.owner===null){msg+=`매입 가격은 ${won(s.price)}입니다.`}else if(s.owner!==turn){let fee=s.fee;p.money-=fee;players[s.owner].money+=fee;msg+=`${players[s.owner].name}에게 통행료 ${won(fee)} 지급.`;log(`${p.name} → ${players[s.owner].name}: 통행료 ${won(fee)}`)}else msg+='내 자산입니다.'}
+else if(s.type==='risk'){
+ if(s.name==='반도체 경쟁 위기' || Math.random()<0.65){stockCrash(p,true);msg+=' 주식 폭락 이벤트가 발생했습니다.'}
+ else {let loss=10+Math.floor(Math.random()*3)*5;p.money-=loss;msg+=`위기 대응 비용 ${won(loss)} 지출.`;log(`${p.name}: ${s.name}, -${won(loss)}`)}
+ }
+else if(s.type==='event'){if(Math.random()<0.22){stockCrash(p);msg+=' 깜짝 폭락 이벤트!'}let events=[['AI 기술 협력 사업 선정',20],['문화유산 보존 활동 보상',15],['예상치 못한 수리비',-15],['수출 계약 성사',20],['물가 상승으로 생활비 증가',-10],['봉사활동 참여 보상',10]];let e=events[Math.floor(Math.random()*events.length)];p.money+=e[1];msg+=`${e[0]}! ${e[1]>=0?'+':'−'}${won(Math.abs(e[1]))}.`;log(`${p.name}: 찬스 - ${e[0]} (${e[1]>=0?'+':'-'}${won(Math.abs(e[1]))})`)}
+else if(s.name==='사회환원: 초록우산'){if(p.money>=10){let yes=confirm('초록우산에 10만 원을 기부할까요?\n기부하면 사회환원 보상으로 15만 원을 받습니다.');if(yes){p.money-=10;p.money+=15;msg+='10만 원 기부! 공동체 보상 +15만 원.';log(`${p.name}: 초록우산 기부 및 +15만 원 보상`) }else msg+='이번에는 기부하지 않았습니다.'}else msg+='잔액이 부족해 기부할 수 없습니다.'}
+else if(s.name==='누리호 발사'){p.money+=15;msg+='우주산업 발전 보상 +15만 원.';log(`${p.name}: 누리호 발사 성공, +15만 원`)}else if(s.name==='사회적 기업 지원'){p.money+=10;msg+='사회적 가치 보상 +10만 원.'}else if(s.name==='공동체 회복'){p.money+=10;msg+='협력 보상 +10만 원.'}else if(s.type==='start'){p.money+=10;msg+='출발점 도착 보너스 +10만 원.'}
+if(p.money<0){p.money=0;msg+=' 잔액이 0원이 되었습니다. 다음 턴부터 계속 도전할 수 있습니다.'}message(msg);log(msg);render();saveOnlineState()}
+function buy(){let p=current(),s=spaces[p.pos];if(onlineMode&&p?.uid!==myPlayerId)return;if(!rolled||s.type!=='asset'||s.owner!==null||p.money<s.price)return;p.money-=s.price;s.owner=turn;p.owned.push(p.pos);message(`${s.name}을(를) ${won(s.price)}에 매입했습니다! 다른 플레이어가 도착하면 통행료를 받습니다.`);log(`${p.name}: ${s.name} 매입 (-${won(s.price)})`);render();saveOnlineState()}
+function endTurn(){if(!rolled||(onlineMode&&current()?.uid!==myPlayerId))return;turn=(turn+1)%players.length;rolled=false;$('roll').textContent='🎲 주사위 굴리기';render();message(`${current().name} 차례입니다. 주사위를 굴리세요.`);saveOnlineState()}
+$('roll').addEventListener('click',move);$('buy').addEventListener('click',buy);$('end').addEventListener('click',endTurn);
+$('reset').addEventListener('click',()=>{if(onlineMode){if(myPlayerId!==roomHostId){roomStatus('새 게임은 방장만 시작할 수 있어요.');return;}setup();players=players.map(p=>({...p,money:100,pos:0,owned:[],out:false}));spaces.forEach(s=>s.owner=null);saveOnlineState();}else setup();});
+$('count').addEventListener('change',setup);
+$('createRoom').addEventListener('click',createOnlineRoom);$('joinRoom').addEventListener('click',joinOnlineRoom);
+$('copyRoom').addEventListener('click',async()=>{if(!roomCode)return;try{await navigator.clipboard.writeText(roomCode);roomStatus(`방 코드 ${roomCode}를 복사했어요. 친구에게 보내세요.`)}catch(e){$('roomInput').value=roomCode;roomStatus('방 코드를 선택해 복사해 주세요: '+roomCode)}});
+$('leaveRoom').addEventListener('click',leaveOnlineRoom);
+setup();
+
+</script></body></html>
