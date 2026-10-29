@@ -159,7 +159,7 @@ async function onlineLogin() {
   myPlayerId = selfId;
   return myPlayerId;
 }
-
+let onlineRoom = null;
 function stopRoomListener() {
   if (onlineRoom) {
     try {
